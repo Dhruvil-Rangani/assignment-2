@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: false })); //Returns middleware that only
 
 //respond message to the home page
 app.get("/", (req, res) => {
-  res.status(500).send(`{"message": "Welcome to DressStore Application"}`);
+  res.status(200).json({message: "Welcome to DressStore Application"});
 })
 
 // Route set-up to get all Products from the database
@@ -41,7 +41,7 @@ app.get("/api/products", async(req,res) => {
     return res.status(400).json({ error: 'Name keyword is required in the query parameter.' });
   }
   // Filter products based on the keyword
-  const filteredProducts = await Product.filter(product =>
+  const filteredProducts = await Product.find(product =>
     product.name.toLowerCase().includes(keyword.toLowerCase()))
   res.json(filteredProducts);
   } catch(error){
@@ -96,7 +96,10 @@ app.delete("/api/products/:id", async(req,res) => {
 // Route setup to delete all the products contains in the database
 app.delete("/api/products", async(req,res) =>{
   try {
-    const product = await Product.delete(req.body);
+    const product = await Product.deleteMany({});
+    if(!product){
+      return res.status(404).send(`Cannot find product with id :${id}`);
+    }
     res.status(200).json(product);
   } catch (error) {
     console.log(error.message);
